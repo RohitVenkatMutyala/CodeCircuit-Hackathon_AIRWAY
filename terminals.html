@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyWay - Airport Terminals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0053b3;
+            --secondary-color: #53a0ff;
+            --accent-color: #ff9a3c;
+            --light-bg: #f5f9ff;
+            --dark-bg: #2c3e50;
+            --text-dark: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Styles */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background-image: linear-gradient(rgba(0, 83, 179, 0.7), rgba(0, 83, 179, 0.7)), url('/api/placeholder/1200/300');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .page-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            max-width: 700px;
+        }
+
+        .terminals-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .terminal-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .terminal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .terminal-header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+        }
+
+        .terminal-info {
+            margin-bottom: 1rem;
+        }
+
+        .terminal-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .terminal-info-item i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .terminal-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-stat-item {
+            background-color: var(--light-bg);
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .terminal-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .terminal-stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .terminal-services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-service {
+            background-color: #f0f4f8;
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .terminal-service i {
+            margin-right: 0.25rem;
+        }
+
+        .terminal-action {
+            text-align: center;
+        }
+
+        .terminal-btn {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            display: inline-block;
+            transition: var(--transition);
+        }
+
+        .terminal-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .flight-info {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .flight-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .flight-stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .flight-stats {
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+        }
+
+        .chart-container {
+            height: 300px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .wait-times {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .wait-times h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .wait-times-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .wait-time-card {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .wait-time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .wait-time-value {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .wait-time-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-low {
+            background-color: #e6f7ed;
+            color: #2e7d32;
+        }
+
+        .status-moderate {
+            background-color: #fff4e5;
+            color: #f57c00;
+        }
+
+        .status-high {
+            background-color: #feeaea;
+            color: #d32f2f;
+        }
+
+        .wait-time-trend {
+            display: flex;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .trend-up {
+            color: #d32f2f;
+        }
+
+        .trend-down {
+            color: #2e7d32;
+        }
+
+        .terminal-filters {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-weight: 500;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-option {
+            background-color: var(--light-bg);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.25rem 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-option:hover {
+            background-color: #e6f0ff;
+        }
+
+        .filter-option.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style-type: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .navbar.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .page-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .terminal-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .terminal-filters {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        /* Add this to the existing style section */
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    width: 80%;
+    max-width: 1000px;
+    animation: modal-fade 0.3s ease;
+}
+
+@keyframes modal-fade {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.modal-header {
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.close-modal {
+    color: var(--text-light);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: var(--accent-color);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Terminal Map Styles */
+.terminal-map-container {
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.map-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.map-control-btn {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.map-control-btn:hover {
+    background-color: #f0f4f8;
+}
+
+.map-control-btn.active {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border-color: var(--primary-color);
+}
+
+.terminal-map {
+    height: 400px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    position: relative;
+}
+
+.map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.legend-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
+.gate-icon {
+    background-color: var(--primary-color);
+}
+
+.food-icon {
+    background-color: #f57c00;
+}
+
+.shop-icon {
+    background-color: #7cb342;
+}
+
+.restroom-icon {
+    background-color: #42a5f5;
+}
+
+.security-icon {
+    background-color: #ec407a;
+}
+
+/* Flight Search Styles */
+.flight-search {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.flight-search h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.search-input-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.search-input-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    align-self: flex-end;
+}
+
+.search-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.quick-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.quick-search-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.quick-search-option {
+    background-color: var(--light-bg);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.quick-search-option:hover {
+    background-color: #e6f0ff;
+}
+
+/* Transit Info Styles */
+.transit-info {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.transit-info h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.transit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+}
+
+.transit-card {
+    background-color: var(--light-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.transit-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.transit-icon {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.transit-card h4 {
+    margin-bottom: 0.5rem;
+}
+
+.transit-card p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.transit-time {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.transit-time i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+/* Accessibility Services Styles */
+.accessibility-services {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.accessibility-services h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+}
+
+.service-card {
+    background-color: var(--light-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.service-icon {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.service-card h4 {
+    margin-bottom: 0.5rem;
+}
+
+.service-card p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.service-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-block;
+    transition: var(--transition);
+}
+
+.service-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* Alert Styles */
+.terminal-alerts {
+    margin-bottom: 1.5rem;
+}
+
+.alert {
+    background-color: white;
+    border-left: 4px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    animation: alert-slide 0.5s ease;
+}
+
+@keyframes alert-slide {
+    from {opacity: 0; transform: translateY(-10px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.alert-icon {
+    color: var(--accent-color);
+    font-size: 1.25rem;
+    padding-top: 0.25rem;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-content h4 {
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+}
+
+.alert-content p {
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.alert-time {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.alert-close:hover {
+    color: var(--text-dark);
+}
+
+/* Responsive Styles for New Components */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .terminal-map {
+        height: 300px;
+    }
+    
+    .search-form {
+        flex-direction: column;
+    }
+    
+    .search-btn {
+        width: 100%;
+    }
+    
+    .alert {
+        flex-direction: column;
+    }
+    
+    .alert-icon {
+        margin-bottom: 0.5rem;
+    }
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.close-modal {
+    font-size: 24px;
+    cursor: pointer;
+}
+.map-control-btn {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border: none;
+    background-color: #eee;
+    cursor: pointer;
+}
+.map-control-btn.active {
+    background-color: #007BFF;
+    color: white;
+}
+.terminal-map {
+    margin-top: 20px;
+    min-height: 100px;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+}
+.close-modal {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.map-control-btn {
+    margin: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.map-control-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+#terminal-map {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    text-align: center;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-plane"></i>
+                <h1>SkyWay</h1>
+            </a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="terminals.html" class="nav-link active">Terminals</a>
+                <a href="gates.html" class="nav-link">Gates</a>
+                <a href="amenities.html" class="nav-link">Amenities</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <h2>Airport Terminals</h2>
+            <p>Discover our terminal facilities, check wait times, and find your way around with our interactive terminal maps and information.</p>
+        </section>
+       <!-- Add this after the page-header section -->
+<section class="terminal-alerts" id="terminal-alerts">
+    <div class="alert">
+        <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="alert-content">
+            <h4>Terminal 3 Security Update</h4>
+            <p>Security checkpoints 2 and 3 are experiencing longer wait times. Please arrive early if flying from Terminal 3.</p>
+            <span class="alert-time">Updated 35 minutes ago</span>
+        </div>
+        <button class="alert-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="alert">
+        <div class="alert-icon"><i class="fas fa-info-circle"></i></div>
+        <div class="alert-content">
+            <h4>Terminal 1 Food Court Renovation</h4>
+            <p>The main food court in Terminal 1 is undergoing renovation. Temporary food options are available near Gate 15.</p>
+            <span class="alert-time">Updated 2 hours ago</span>
+        </div>
+        <button class="alert-close"><i class="fas fa-times"></i></button>
+    </div>
+</section>
+       
+        <!-- Add this after the terminal-filters section -->
+<section class="flight-search">
+    <h3>Find Your Flight</h3>
+    <div class="search-form">
+        <div class="search-input-group">
+            <label for="flight-number">Flight Number</label>
+            <input type="text" id="flight-number" placeholder="e.g. AA1234">
+        </div>
+        <div class="search-input-group">
+            <label for="flight-date">Date</label>
+            <input type="date" id="flight-date">
+        </div>
+        <button class="search-btn">Find Flight</button>
+    </div>
+    <div class="quick-search">
+        <span>Quick Search:</span>
+        <div class="quick-search-options">
+            <span class="quick-search-option" data-airline="AA">American</span>
+            <span class="quick-search-option" data-airline="DL">Delta</span>
+            <span class="quick-search-option" data-airline="UA">United</span>
+            <span class="quick-search-option" data-airline="WN">Southwest</span>
+        </div>
+    </div>
+</section>
+
+        <section class="terminals-container" id="terminals-grid">
+            <!-- Terminal 1 -->
+            <div class="terminal-card" data-terminal="1" data-type="domestic">
+                <div class="terminal-header">
+                    <h3>Terminal 1</h3>
+                    <span><i class="fas fa-plane"></i> Domestic</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-info">
+                        <div class="terminal-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Operating Hours: 24/7</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-users"></i>
+                            <span>Current Occupancy: Moderate</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-walking"></i>
+                            <span>Walking Time: 5-10 min to Gates</span>
+                        </div>
+                    </div>
+                    <div class="terminal-stats">
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">15</div>
+                            <div class="terminal-stat-label">Gates</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">8</div>
+                            <div class="terminal-stat-label">Airlines</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">12</div>
+                            <div class="terminal-stat-label">Shops</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">10</div>
+                            <div class="terminal-stat-label">Restaurants</div>
+                        </div>
+                    </div>
+                    <div class="terminal-services">
+                        <span class="terminal-service"><i class="fas fa-wifi"></i> Free WiFi</span>
+                        <span class="terminal-service"><i class="fas fa-charging-station"></i> Charging</span>
+                        <span class="terminal-service"><i class="fas fa-restroom"></i> Restrooms</span>
+                        <span class="terminal-service"><i class="fas fa-wheelchair"></i> Accessible</span>
+                        <span class="terminal-service"><i class="fas fa-baby"></i> Baby Care</span>
+                    </div>
+                    <div class="terminal-action">
+                        <a href="#" class="terminal-btn" data-terminal="1">View Terminal Map</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal 2 -->
+            <div class="terminal-card" data-terminal="2" data-type="domestic">
+                <div class="terminal-header">
+                    <h3>Terminal 2</h3>
+                    <span><i class="fas fa-plane"></i> Domestic</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-info">
+                        <div class="terminal-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Operating Hours: 24/7</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-users"></i>
+                            <span>Current Occupancy: Low</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-walking"></i>
+                            <span>Walking Time: 8-12 min to Gates</span>
+                        </div>
+                    </div>
+                    <div class="terminal-stats">
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">18</div>
+                            <div class="terminal-stat-label">Gates</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">6</div>
+                            <div class="terminal-stat-label">Airlines</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">14</div>
+                            <div class="terminal-stat-label">Shops</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">12</div>
+                            <div class="terminal-stat-label">Restaurants</div>
+                        </div>
+                    </div>
+                    <div class="terminal-services">
+                        <span class="terminal-service"><i class="fas fa-wifi"></i> Free WiFi</span>
+                        <span class="terminal-service"><i class="fas fa-charging-station"></i> Charging</span>
+                        <span class="terminal-service"><i class="fas fa-restroom"></i> Restrooms</span>
+                        <span class="terminal-service"><i class="fas fa-wheelchair"></i> Accessible</span>
+                        <span class="terminal-service"><i class="fas fa-spa"></i> Spa</span>
+                    </div>
+                    <div class="terminal-action">
+                        <a href="#" class="terminal-btn" data-terminal="2">View Terminal Map</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal 3 -->
+            <div class="terminal-card" data-terminal="3" data-type="international">
+                <div class="terminal-header">
+                    <h3>Terminal 3</h3>
+                    <span><i class="fas fa-globe-americas"></i> International</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-info">
+                        <div class="terminal-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Operating Hours: 24/7</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-users"></i>
+                            <span>Current Occupancy: High</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-walking"></i>
+                            <span>Walking Time: 10-15 min to Gates</span>
+                        </div>
+                    </div>
+                    <div class="terminal-stats">
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">22</div>
+                            <div class="terminal-stat-label">Gates</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">14</div>
+                            <div class="terminal-stat-label">Airlines</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">18</div>
+                            <div class="terminal-stat-label">Shops</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">15</div>
+                            <div class="terminal-stat-label">Restaurants</div>
+                        </div>
+                    </div>
+                    <div class="terminal-services">
+                        <span class="terminal-service"><i class="fas fa-wifi"></i> Free WiFi</span>
+                        <span class="terminal-service"><i class="fas fa-charging-station"></i> Charging</span>
+                        <span class="terminal-service"><i class="fas fa-restroom"></i> Restrooms</span>
+                        <span class="terminal-service"><i class="fas fa-wheelchair"></i> Accessible</span>
+                        <span class="terminal-service"><i class="fas fa-bed"></i> Sleep Pods</span>
+                    </div>
+                    <div class="terminal-action">
+                        <a href="#" class="terminal-btn" data-terminal="3">View Terminal Map</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal 4 -->
+            <div class="terminal-card" data-terminal="4" data-type="international">
+                <div class="terminal-header">
+                    <h3>Terminal 4</h3>
+                    <span><i class="fas fa-globe-americas"></i> International</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-info">
+                        <div class="terminal-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Operating Hours: 24/7</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-users"></i>
+                            <span>Current Occupancy: Moderate</span>
+                        </div>
+                        <div class="terminal-info-item">
+                            <i class="fas fa-walking"></i>
+                            <span>Walking Time: 12-18 min to Gates</span>
+                        </div>
+                    </div>
+                    <div class="terminal-stats">
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">20</div>
+                            <div class="terminal-stat-label">Gates</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">12</div>
+                            <div class="terminal-stat-label">Airlines</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">16</div>
+                            <div class="terminal-stat-label">Shops</div>
+                        </div>
+                        <div class="terminal-stat-item">
+                            <div class="terminal-stat-value">14</div>
+                            <div class="terminal-stat-label">Restaurants</div>
+                        </div>
+                    </div>
+                    <div class="terminal-services">
+                        <span class="terminal-service"><i class="fas fa-wifi"></i> Free WiFi</span>
+                        <span class="terminal-service"><i class="fas fa-charging-station"></i> Charging</span>
+                        <span class="terminal-service"><i class="fas fa-restroom"></i> Restrooms</span>
+                        <span class="terminal-service"><i class="fas fa-wheelchair"></i> Accessible</span>
+                        <span class="terminal-service"><i class="fas fa-shower"></i> Showers</span>
+                    </div>
+                    <div class="terminal-action">
+                        <a href="#" class="terminal-btn" data-terminal="4">View Terminal Map</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+ <section class="chart-container">
+    <h3>Flight Distribution by Terminal</h3>
+
+    <!-- Terminal Map Modal -->
+    <div id="terminal-map-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="map-terminal-title">Terminal Map</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="terminal-map-container">
+                    <div class="map-controls">
+                        <button class="map-control-btn active" data-floor="1">Level 1</button>
+                        <button class="map-control-btn" data-floor="2">Level 2</button>
+                        <button class="map-control-btn" data-floor="3">Level 3</button>
+                    </div>
+                    <div class="terminal-map" id="terminal-map">
+                        <!-- Map will be loaded here -->
+                    </div>
+                </div>
+                <div class="map-legend">
+                    <div class="legend-item"><span class="legend-icon gate-icon"></span> Gates</div>
+                    <div class="legend-item"><span class="legend-icon food-icon"></span> Food</div>
+                    <div class="legend-item"><span class="legend-icon shop-icon"></span> Shops</div>
+                    <div class="legend-item"><span class="legend-icon restroom-icon"></span> Restrooms</div>
+                    <div class="legend-item"><span class="legend-icon security-icon"></span> Security</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Chart -->
+    <canvas id="terminal-chart" width="400" height="200"></canvas>
+</section>
+
+        <section class="wait-times">
+            <h3>Current Wait Times</h3>
+            <div class="wait-times-grid">
+                <div class="wait-time-card">
+                    <div class="wait-time-header">
+                        <h4>Terminal 1 Security</h4>
+                        <span class="wait-time-status status-moderate">Moderate</span>
+                    </div>
+                    <div class="wait-time-value">15 min</div>
+                    <div class="wait-time-trend">
+                        <i class="fas fa-arrow-up trend-up"></i>
+                        <span>5 min from 1 hour ago</span>
+                    </div>
+                </div>
+                <div class="wait-time-card">
+                    <div class="wait-time-header">
+                        <h4>Terminal 2 Security</h4>
+                        <span class="wait-time-status status-low">Low</span>
+                    </div>
+                    <div class="wait-time-value">8 min</div>
+                    <div class="wait-time-trend">
+                        <i class="fas fa-arrow-down trend-down"></i>
+                        <span>3 min from 1 hour ago</span>
+                    </div>
+                </div>
+                <div class="wait-time-card">
+                    <div class="wait-time-header">
+                        <h4>Terminal 3 Security</h4>
+                        <span class="wait-time-status status-high">High</span>
+                    </div>
+                    <div class="wait-time-value">25 min</div>
+                    <div class="wait-time-trend">
+                        <i class="fas fa-arrow-up trend-up"></i>
+                        <span>10 min from 1 hour ago</span>
+                    </div>
+                </div>
+                <div class="wait-time-card">
+                    <div class="wait-time-header">
+                        <h4>Terminal 4 Security</h4>
+                        <span class="wait-time-status status-moderate">Moderate</span>
+                    </div>
+                    <div class="wait-time-value">18 min</div>
+                    <div class="wait-time-trend">
+                        <i class="fas fa-arrow-up trend-up"></i>
+                        <span>4 min from 1 hour ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Add this after the wait-times section -->
+<section class="transit-info">
+    <h3>Airport Transit Options</h3>
+    <div class="transit-grid">
+        <div class="transit-card">
+            <div class="transit-icon"><i class="fas fa-subway"></i></div>
+            <h4>Subway Connection</h4>
+            <p>Direct connection to Line A and B. Stations at Terminal 1 and Terminal 3.</p>
+            <div class="transit-time">
+                <i class="fas fa-clock"></i>
+                <span>Every 10 min (5:00 AM - 12:00 AM)</span>
+            </div>
+        </div>
+        <div class="transit-card">
+            <div class="transit-icon"><i class="fas fa-bus"></i></div>
+            <h4>Airport Shuttle</h4>
+            <p>Free shuttle service between all terminals. Operates 24/7.</p>
+            <div class="transit-time">
+                <i class="fas fa-clock"></i>
+                <span>Every 15 min</span>
+            </div>
+        </div>
+        <div class="transit-card">
+            <div class="transit-icon"><i class="fas fa-taxi"></i></div>
+            <h4>Taxi Stand</h4>
+            <p>Available at all terminals at designated pickup areas.</p>
+            <div class="transit-time">
+                <i class="fas fa-clock"></i>
+                <span>Available 24/7</span>
+            </div>
+        </div>
+        <div class="transit-card">
+            <div class="transit-icon"><i class="fas fa-car"></i></div>
+            <h4>Ride Sharing</h4>
+            <p>Designated pickup zones for Uber, Ola and other services.</p>
+            <div class="transit-time">
+                <i class="fas fa-clock"></i>
+                <span>Available 24/7</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Add this after the transit-info section -->
+<section class="accessibility-services">
+    <h3>Accessibility Services</h3>
+    <div class="service-grid">
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-wheelchair"></i></div>
+            <h4>Wheelchair Assistance</h4>
+            <p>Available at all terminals. Request at least 48 hours before your flight.</p>
+            <a href="#" class="service-link">Request Service</a>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-deaf"></i></div>
+            <h4>Hearing Loops</h4>
+            <p>Available at all information desks and gate areas.</p>
+            <a href="#" class="service-link">Learn More</a>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-blind"></i></div>
+            <h4>Visual Assistance</h4>
+            <p>Braille signage and audio navigation assistance available.</p>
+            <a href="#" class="service-link">Request Service</a>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-dog"></i></div>
+            <h4>Service Animal Relief Areas</h4>
+            <p>Available in all terminals past security checkpoints.</p>
+            <a href="#" class="service-link">View Locations</a>
+        </div>
+    </div>
+</section>
+
+    </main>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>SkyWay Airport</h3>
+                <p>Making airport navigation intuitive and stress-free.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="terminals.html">Terminals</a></li>
+                    <li><a href="gates.html">Gates</a></li>
+                    <li><a href="amenities.html">Amenities</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Airport Map</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Travel Tips</a></li>
+                    <li><a href="#">Transportation</a></li>
+                    <li><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> info@skyway.com</li>
+                    <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Terminal 1, Gate Info Desk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 SkyWay Airport Navigation. All rights reserved.
+        </div>
+    </footer>
+<!-- Chart.js (required for terminal chart) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== Terminal Map Modal Handling =====
+    const modal = document.getElementById('terminal-map-modal');
+    const openModalBtns = document.querySelectorAll('.terminal-btn, #open-modal-btn');
+    const closeModal = document.querySelector('.close-modal');
+    const terminalMap = document.getElementById('terminal-map');
+    const mapTitle = document.getElementById('map-terminal-title');
+
+    let currentTerminal = 1; // default
+
+    openModalBtns.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            currentTerminal = this.getAttribute('data-terminal') || 'Main';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            mapTitle.textContent = `Terminal ${currentTerminal} Map`;
+
+            // Default to Level 1
+            setActiveFloorButton(1);
+            loadMapFloor(1);
+        });
+    });
+
+    closeModal.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    });
+
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // ===== Floor Controls =====
+    const floorButtons = document.querySelectorAll('.map-control-btn');
+
+    floorButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const floor = this.getAttribute('data-floor');
+            setActiveFloorButton(floor);
+            loadMapFloor(floor);
+        });
+    });
+
+    function setActiveFloorButton(floor) {
+        floorButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-floor') === String(floor)) {
+                btn.classList.add('active');
+            }
+        });
+    }
+function loadMapFloor(floor) {
+    const width = 600;
+    const height = 300;
+    const labelText = `L${floor}`;
+    const mapImgURL = `https://via.placeholder.com/${width}x${height}?text=${labelText}`;
+
+    terminalMap.innerHTML = `
+        <div style="text-align: center;">
+            <h4 style="margin-bottom: 10px;">Terminal ${currentTerminal} - Level ${floor}</h4>
+            <img src="${mapImgURL}" alt="Map" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        </div>
+    `;
+}
+
+
+
+    // ===== Terminal Chart (Bar Chart) =====
+    const chartCanvas = document.getElementById('terminal-chart');
+    if (chartCanvas) {
+        const ctx = chartCanvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Terminal 1', 'Terminal 2', 'Terminal 3', 'Terminal 4'],
+                datasets: [{
+                    label: 'Number of Flights',
+                    data: [20, 35, 15, 28],
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Flight Distribution by Terminal' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flights'
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>

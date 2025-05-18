@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyWay - Gate Navigator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0053b3;
+            --secondary-color: #53a0ff;
+            --accent-color: #ff9a3c;
+            --light-bg: #f5f9ff;
+            --dark-bg: #2c3e50;
+            --text-dark: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Styles */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .filters-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .filters-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filters-title h3 {
+            color: var(--primary-color);
+        }
+
+        .filters-reset {
+            color: var(--primary-color);
+            background: none;
+            border: 1px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filters-reset:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .gates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .gate-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .gate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .gate-terminal {
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gate-terminal span {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .gate-content {
+            padding: 1.5rem;
+        }
+
+        .gate-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .gate-flight {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .airline-logo {
+            width: 30px;
+            height: 30px;
+            background-color: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .gate-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .info-row p:first-child {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .info-row p:last-child {
+            font-weight: 500;
+        }
+
+        .gate-walking {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .gate-amenities {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .amenity-tag {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            color: #777;
+        }
+
+        .gate-status {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            border-bottom-left-radius: var(--border-radius);
+        }
+
+        .status-active {
+            background-color: #2ecc71;
+        }
+
+        .status-boarding {
+            background-color: #3498db;
+        }
+
+        .status-delayed {
+            background-color: #f39c12;
+        }
+
+        .status-closed {
+            background-color: #e74c3c;
+        }
+
+        .gate-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .gate-bottom a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .gate-bottom a:hover {
+            color: var(--secondary-color);
+        }
+
+        .gate-congestion {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .congestion-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .congestion-low {
+            background-color: #2ecc71;
+        }
+
+        .congestion-medium {
+            background-color: #f39c12;
+        }
+
+        .congestion-high {
+            background-color: #e74c3c;
+        }
+
+        .visualization-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .visualization-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .visualization-header h3 {
+            color: var(--primary-color);
+        }
+
+        .visualization-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .visualization-options button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .visualization-options button:hover,
+        .visualization-options button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination button:hover,
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Terminal Map */
+        .terminal-map-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .terminal-map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .terminal-map-header h3 {
+            color: var(--primary-color);
+        }
+
+        .terminal-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-selector button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .terminal-selector button:hover,
+        .terminal-selector button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .map-display {
+            height: 400px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style-type: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .terminal-selector {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .terminal-selector button {
+                white-space: nowrap;
+            }
+
+            .navbar {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .navbar.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-plane"></i>
+                <h1>SkyWay</h1>
+            </a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="terminals.html" class="nav-link">Terminals</a>
+                <a href="gates.html" class="nav-link active">Gates</a>
+                <a href="amenities.html" class="nav-link">Amenities</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h2>Gate Navigator</h2>
+            <div class="search-container">
+                <input type="text" id="gate-search"  style="width: 20em; height: 3em;   border-radius: 0.50em;" placeholder="      Search gates .....">
+            </div>
+        </div>
+
+        <section class="filters-container">
+            <div class="filters-title">
+                <h3>Filter Gates</h3>
+                <button class="filters-reset" id="reset-filters">Reset Filters</button>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="terminal-filter">Terminal</label>
+                    <select id="terminal-filter">
+                        <option value="all">All Terminals</option>
+                        <option value="T1">Terminal 1</option>
+                        <option value="T2">Terminal 2</option>
+                        <option value="T3">Terminal 3</option>
+                        <option value="T4">Terminal 4</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="airline-filter">Airline</label>
+                    <select id="airline-filter">
+                        <option value="all">All Airlines</option>
+                        <option value="AA">American Airlines (AA)</option>
+                        <option value="DL">Delta Airlines (DL)</option>
+                        <option value="UA">United Airlines (UA)</option>
+                        <option value="BA">British Airways (BA)</option>
+                        <option value="SQ">Singapore Airlines (SQ)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="boarding">Boarding</option>
+                        <option value="delayed">Delayed</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="walking-filter">Max Walking Time</label>
+                    <select id="walking-filter">
+                        <option value="all">Any Distance</option>
+                        <option value="5">Under 5 mins</option>
+                        <option value="10">Under 10 mins</option>
+                        <option value="15">Under 15 mins</option>
+                        <option value="20">Under 20 mins</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="terminal-map-container">
+            <div class="terminal-map-header">
+                <h3>Interactive Terminal Map</h3>
+                <div class="terminal-selector">
+                    <button class="terminal-btn active" data-terminal="T1">Terminal 1</button>
+                    <button class="terminal-btn" data-terminal="T2">Terminal 2</button>
+                    <button class="terminal-btn" data-terminal="T3">Terminal 3</button>
+                    <button class="terminal-btn" data-terminal="T4">Terminal 4</button>
+                </div>
+            </div>
+            <div class="map-display" id="terminal-map"></div>
+        </section>
+
+        <section class="visualization-container">
+            <div class="visualization-header">
+                <h3>Gate Occupancy Stats</h3>
+                <div class="visualization-options">
+                    <button class="chart-option active" data-chart="occupancy">Occupancy</button>
+                    <button class="chart-option" data-chart="flights">Flights</button>
+                    <button class="chart-option" data-chart="walking">Walking Times</button>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-area"></div>
+        </section>
+
+        <section class="gates-grid" id="gates-container">
+            <!-- Gates will be dynamically inserted here -->
+        </section>
+
+        <div class="pagination" id="pagination">
+            <button class="page-btn" data-page="1">1</button>
+            <button class="page-btn" data-page="2">2</button>
+            <button class="page-btn" data-page="3">3</button>
+            <button class="page-btn next-btn">
+                <i class="fas fa-angle-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>SkyWay Airport</h3>
+                <p>Making airport navigation intuitive and stress-free.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="terminals.html">Terminals</a></li>
+                    <li><a href="gates.html">Gates</a></li>
+                    <li><a href="amenities.html">Amenities</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Airport Map</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Travel Tips</a></li>
+                    <li><a href="#">Transportation</a></li>
+                    <li><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> info@skyway.com</li>
+                    <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Terminal 1, Gate Info Desk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 SkyWay Airport Navigation. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+        // Sample data for gates
+        const gatesData = [
+            {
+                id: 'g1',
+                number: 'A1',
+                terminal: 'T1',
+                airline: 'AA',
+                airlineName: 'American Airlines',
+                flight: 'AA1234',
+                destination: 'New York (JFK)',
+                departureTime: '10:30 AM',
+                status: 'active',
+                statusText: 'Active',
+                congestion: 'low',
+                walkingTime: 7,
+                amenities: ['Restroom', 'Water Fountain']
+            },
+            {
+                id: 'g2',
+                number: 'A2',
+                terminal: 'T1',
+                airline: 'UA',
+                airlineName: 'United Airlines',
+                flight: 'UA5678',
+                destination: 'Chicago (ORD)',
+                departureTime: '11:45 AM',
+                status: 'boarding',
+                statusText: 'Boarding',
+                congestion: 'medium',
+                walkingTime: 5,
+                amenities: ['Restroom', 'Coffee Shop']
+            },
+            {
+                id: 'g3',
+                number: 'B1',
+                terminal: 'T2',
+                airline: 'DL',
+                airlineName: 'Delta Airlines',
+                flight: 'DL9012',
+                destination: 'Los Angeles (LAX)',
+                departureTime: '12:15 PM',
+                status: 'delayed',
+                statusText: 'Delayed 30m',
+                congestion: 'high',
+                walkingTime: 12,
+                amenities: ['Restroom', 'Restaurant', 'Charging Station']
+            },
+            {
+                id: 'g4',
+                number: 'B2',
+                terminal: 'T2',
+                airline: 'BA',
+                airlineName: 'British Airways',
+                flight: 'BA3456',
+                destination: 'London (LHR)',
+                departureTime: '02:20 PM',
+                status: 'active',
+                statusText: 'Active',
+                congestion: 'low',
+                walkingTime: 15,
+                amenities: ['Restroom', 'Duty Free']
+            },
+            {
+                id: 'g5',
+                number: 'C1',
+                terminal: 'T3',
+                airline: 'SQ',
+                airlineName: 'Singapore Airlines',
+                flight: 'SQ7890',
+                destination: 'Singapore (SIN)',
+                departureTime: '11:30 PM',
+                status: 'closed',
+                statusText: 'Closed',
+                congestion: 'low',
+                walkingTime: 20,
+                amenities: ['Restroom', 'Lounge Access']
+            },
+            {
+                id: 'g6',
+                number: 'C2',
+                terminal: 'T3',
+                airline: 'DL',
+                airlineName: 'Delta Airlines',
+                flight: 'DL4567',
+                destination: 'Atlanta (ATL)',
+                departureTime: '03:15 PM',
+                status: 'boarding',
+                statusText: 'Boarding',
+                congestion: 'high',
+                walkingTime: 18,
+                amenities: ['Restroom', 'Food Court']
+            },
+            {
+                id: 'g7',
+                number: 'D1',
+                terminal: 'T4',
+                airline: 'UA',
+                airlineName: 'United Airlines',
+                flight: 'UA8901',
+                destination: 'Denver (DEN)',
+                departureTime: '01:30 PM',
+                status: 'active',
+                statusText: 'Active',
+                congestion: 'medium',
+                walkingTime: 10,
+                amenities: ['Restroom', 'Pharmacy']
+            },
+            {
+                id: 'g8',
+                number: 'D2',
+                terminal: 'T4',
+                airline: 'AA',
+                airlineName: 'American Airlines',
+                flight: 'AA2345',
+                destination: 'Miami (MIA)',
+                departureTime: '04:45 PM',
+                status: 'delayed',
+                statusText: 'Delayed 45m',
+                congestion: 'medium',
+                walkingTime: 8,
+                amenities: ['Restroom', 'Convenience Store']
+            }
+        ];
+
+        // Gate rendering function
+        function renderGates(gates) {
+            const gatesContainer = document.getElementById('gates-container');
+            gatesContainer.innerHTML = '';
+
+            if (gates.length === 0) {
+                gatesContainer.innerHTML = '<div class="no-results">No gates match your search criteria. Please adjust your filters.</div>';
+                return;
+            }
+
+            gates.forEach(gate => {
+                const gateCard = document.createElement('div');
+                gateCard.className = 'gate-card';
+                gateCard.innerHTML = `
+                    <div class="gate-terminal">
+                        ${gate.terminal} <span>${gate.number}</span>
+                    </div>
+                    <div class="gate-status status-${gate.status}">${gate.statusText}</div>
+                    <div class="gate-content">
+                        <div class="gate-number">${gate.terminal}-${gate.number}</div>
+                        <div class="gate-flight">
+                            <div class="airline-logo">${gate.airline}</div>
+                            <div>
+                                <p><strong>${gate.flight}</strong></p>
+                                <p>${gate.destination}</p>
+                            </div>
+                        </div>
+                        <div class="gate-info">
+                            <div class="info-row">
+                                <p>Airline:</p>
+                                <p>${gate.airlineName}</p>
+                            </div>
+                            <div class="info-row">
+                                <p>Departure:</p>
+                                <p>${gate.departureTime}</p>
+                            </div>
+                        </div>
+                        <div class="gate-walking">
+                            <i class="fas fa-walking"></i> ${gate.walkingTime} min walk from current location
+                        </div>
+                        <div class="gate-amenities">
+                            ${gate.amenities.map(amenity => `<span class="amenity-tag">${amenity}</span>`).join('')}
+                        </div>
+                      
+                        </div>
+                    </div>
+                    <div class="gate-bottom">
+                        <div class="gate-congestion">
+                            <div class="congestion-indicator congestion-${gate.congestion}"></div>
+                            <span>${gate.congestion.charAt(0).toUpperCase() + gate.congestion.slice(1)} Traffic</span>
+                        </div>
+                        <a href="#" data-gate-id="${gate.id}" class="gate-details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                `;
+                gatesContainer.appendChild(gateCard);
+            });
+
+            // Add event listeners to the gate details buttons
+            const detailButtons = document.querySelectorAll('.gate-details-btn');
+            detailButtons.forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const gateId = btn.getAttribute('data-gate-id');
+                    showGateDetails(gateId);
+                });
+            });
+        }
+
+        // Function to show gate details (can be expanded)
+        function showGateDetails(gateId) {
+            const gate = gatesData.find(g => g.id === gateId);
+            alert(`Detailed information for Gate ${gate.terminal}-${gate.number} coming soon!`);
+            // This could be expanded to open a modal with full gate details
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const terminalFilter = document.getElementById('terminal-filter').value;
+            const airlineFilter = document.getElementById('airline-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const walkingFilter = parseInt(document.getElementById('walking-filter').value) || 0;
+            const searchQuery = document.getElementById('gate-search').value.toLowerCase();
+
+            const filteredGates = gatesData.filter(gate => {
+                // Terminal filter
+                if (terminalFilter !== 'all' && gate.terminal !== terminalFilter) return false;
+                
+                // Airline filter
+                if (airlineFilter !== 'all' && gate.airline !== airlineFilter) return false;
+                
+                // Status filter
+                if (statusFilter !== 'all' && gate.status !== statusFilter) return false;
+                
+                // Walking time filter
+                if (walkingFilter > 0 && gate.walkingTime > walkingFilter) return false;
+                
+                // Search query
+                if (searchQuery) {
+                    const searchable = `${gate.terminal}-${gate.number} ${gate.airline} ${gate.airlineName} ${gate.flight} ${gate.destination}`.toLowerCase();
+                    if (!searchable.includes(searchQuery)) return false;
+                }
+                
+                return true;
+            });
+
+            renderGates(filteredGates);
+            updateCharts(filteredGates);
+        }
+
+        // Chart visualization using D3.js
+        function initCharts() {
+            updateCharts(gatesData);
+        }
+
+        function updateCharts(data) {
+            const chartArea = document.getElementById('chart-area');
+            const activeChart = document.querySelector('.chart-option.active').getAttribute('data-chart');
+            
+            // Clear previous chart
+            chartArea.innerHTML = '';
+            
+            // Set dimensions
+            const margin = {top: 30, right: 30, bottom: 50, left: 60};
+            const width = chartArea.clientWidth - margin.left - margin.right;
+            const height = chartArea.clientHeight - margin.top - margin.bottom;
+            
+            // Create SVG
+            const svg = d3.select('#chart-area')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+                
+            if (activeChart === 'occupancy') {
+                // Occupancy chart (grouped by terminal)
+                const terminalCounts = {};
+                data.forEach(gate => {
+                    terminalCounts[gate.terminal] = (terminalCounts[gate.terminal] || 0) + 1;
+                });
+                
+                const chartData = Object.keys(terminalCounts).map(terminal => {
+                    return {terminal: terminal, count: terminalCounts[terminal]};
+                }).sort((a, b) => a.terminal.localeCompare(b.terminal));
+                
+                // X axis
+                const x = d3.scaleBand()
+                    .range([0, width])
+                    .domain(chartData.map(d => d.terminal))
+                    .padding(0.3);
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll('text')
+                    .style('font-size', '12px');
+                
+                // Y axis
+                const maxCount = Math.max(...chartData.map(d => d.count)) || 1;
+                const y = d3.scaleLinear()
+                    .domain([0, maxCount + 1])
+                    .range([height, 0]);
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+                
+                // Bars
+                svg.selectAll('bars')
+                    .data(chartData)
+                    .enter()
+                    .append('rect')
+                    .attr('x', d => x(d.terminal))
+                    .attr('y', d => y(d.count))
+                    .attr('width', x.bandwidth())
+                    .attr('height', d => height - y(d.count))
+                    .attr('fill', '#0053b3');
+                
+                // Labels
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', width/2)
+                    .attr('y', height + margin.bottom - 10)
+                    .text('Terminal')
+                    .style('font-size', '14px');
+                
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', -margin.left + 15)
+                    .attr('x', -height/2)
+                    .text('Number of Gates')
+                    .style('font-size', '14px');
+                
+            } else if (activeChart === 'flights') {
+                // Flights chart (grouped by airline)
+                const airlineCounts = {};
+                data.forEach(gate => {
+                    airlineCounts[gate.airline] = (airlineCounts[gate.airline] || 0) + 1;
+                });
+                
+                const chartData = Object.keys(airlineCounts).map(airline => {
+                    return {airline: airline, count: airlineCounts[airline]};
+                }).sort((a, b) => a.airline.localeCompare(b.airline));
+                
+                // X axis
+                const x = d3.scaleBand()
+                    .range([0, width])
+                    .domain(chartData.map(d => d.airline))
+                    .padding(0.3);
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll('text')
+                    .style('font-size', '12px');
+                
+                // Y axis
+                const maxCount = Math.max(...chartData.map(d => d.count)) || 1;
+                const y = d3.scaleLinear()
+                    .domain([0, maxCount + 1])
+                    .range([height, 0]);
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+                
+                // Bars
+                svg.selectAll('bars')
+                    .data(chartData)
+                    .enter()
+                    .append('rect')
+                    .attr('x', d => x(d.airline))
+                    .attr('y', d => y(d.count))
+                    .attr('width', x.bandwidth())
+                    .attr('height', d => height - y(d.count))
+                    .attr('fill', '#53a0ff');
+                
+                // Labels
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', width/2)
+                    .attr('y', height + margin.bottom - 10)
+                    .text('Airline')
+                    .style('font-size', '14px');
+                
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', -margin.left + 15)
+                    .attr('x', -height/2)
+                    .text('Number of Flights')
+                    .style('font-size', '14px');
+                
+            } else if (activeChart === 'walking') {
+                // Walking times chart
+                const chartData = [...data].sort((a, b) => a.walkingTime - b.walkingTime);
+                
+                // X axis
+                const x = d3.scaleLinear()
+                    .domain([0, Math.max(...chartData.map(d => d.walkingTime)) + 5])
+                    .range([0, width]);
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll('text')
+                    .style('font-size', '12px');
+                
+                // Y axis
+                const y = d3.scaleBand()
+                    .domain(chartData.map(d => `${d.terminal}-${d.number}`))
+                    .range([0, height])
+                    .padding(0.3);
+                svg.append('g')
+                    .call(d3.axisLeft(y))
+                    .selectAll('text')
+                    .style('font-size', '12px');
+                
+                // Bars
+                svg.selectAll('bars')
+                    .data(chartData)
+                    .enter()
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', d => y(`${d.terminal}-${d.number}`))
+                    .attr('width', d => x(d.walkingTime))
+                    .attr('height', y.bandwidth())
+                    .attr('fill', '#ff9a3c');
+                
+                // Labels
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', width/2)
+                    .attr('y', height + margin.bottom - 10)
+                    .text('Walking Time (minutes)')
+                    .style('font-size', '14px');
+                
+                svg.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', -margin.left + 15)
+                    .attr('x', -height/2)
+                    .text('Gate')
+                    .style('font-size', '14px');
+            }
+        }
+
+        // Terminal Map
+        function initTerminalMap() {
+            const mapContainer = document.getElementById('terminal-map');
+            const activeTerminal = document.querySelector('.terminal-btn.active').getAttribute('data-terminal');
+            drawTerminalMap(activeTerminal);
+        }
+
+        function drawTerminalMap(terminalId) {
+            const mapContainer = document.getElementById('terminal-map');
+            
+            // Clear previous map
+            mapContainer.innerHTML = '';
+            
+            // Create SVG for the map
+            const width = mapContainer.clientWidth;
+            const height = mapContainer.clientHeight;
+            
+            const svg = d3.select('#terminal-map')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Background
+            svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('fill', '#f5f5f5');
+            
+            // Terminal specific layout
+            let gates = gatesData.filter(gate => gate.terminal === terminalId);
+            
+            // Common elements
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '18px')
+                .style('font-weight', 'bold')
+                .text(`${terminalId} Layout`);
+            
+            // Draw main corridor
+            svg.append('rect')
+                .attr('x', width * 0.1)
+                .attr('y', height * 0.4)
+                .attr('width', width * 0.8)
+                .attr('height', height * 0.2)
+                .attr('fill', '#ddd');
+            
+            // Draw gates
+            const gateWidth = (width * 0.8) / Math.max(gates.length, 1);
+            gates.forEach((gate, index) => {
+                const gateX = width * 0.1 + index * gateWidth;
+                const gateY = height * 0.4 - 60;
+                
+                // Gate box
+                svg.append('rect')
+                    .attr('x', gateX + gateWidth * 0.1)
+                    .attr('y', gateY)
+                    .attr('width', gateWidth * 0.8)
+                    .attr('height', 50)
+                    .attr('fill', getStatusColor(gate.status))
+                    .attr('stroke', '#333')
+                    .attr('stroke-width', 1)
+                    .attr('rx', 5);
+                
+                // Gate label
+                svg.append('text')
+                    .attr('x', gateX + gateWidth * 0.5)
+                    .attr('y', gateY + 30)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', 'white')
+                    .style('font-weight', 'bold')
+                    .text(`${gate.number}`);
+            });
+            
+            // Legend
+            const legendData = [
+                { status: 'active', label: 'Active' },
+                { status: 'boarding', label: 'Boarding' },
+                { status: 'delayed', label: 'Delayed' },
+                { status: 'closed', label: 'Closed' }
+            ];
+            
+            legendData.forEach((item, index) => {
+                // Legend box
+                svg.append('rect')
+                    .attr('x', width * 0.1 + index * (width * 0.2))
+                    .attr('y', height * 0.8)
+                    .attr('width', 20)
+                    .attr('height', 20)
+                    .attr('fill', getStatusColor(item.status));
+                
+                // Legend text
+                svg.append('text')
+                    .attr('x', width * 0.1 + index * (width * 0.2) + 25)
+                    .attr('y', height * 0.8 + 15)
+                    .text(item.label)
+                    .style('font-size', '12px');
+            });
+            
+            // You are here marker
+            svg.append('circle')
+                .attr('cx', width * 0.5)
+                .attr('cy', height * 0.7)
+                .attr('r', 8)
+                .attr('fill', 'red');
+            
+            svg.append('text')
+                .attr('x', width * 0.5)
+                .attr('y', height * 0.7 + 20)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .text('You are here');
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'active': return '#2ecc71';
+                case 'boarding': return '#3498db';
+                case 'delayed': return '#f39c12';
+                case 'closed': return '#e74c3c';
+                default: return '#999';
+            }
+        }
+
+        // Initialize the application
+        function initApp() {
+            // Initial rendering
+            renderGates(gatesData);
+            initCharts();
+            initTerminalMap();
+            
+            // Set up event listeners
+            document.getElementById('terminal-filter').addEventListener('change', applyFilters);
+            document.getElementById('airline-filter').addEventListener('change', applyFilters);
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('walking-filter').addEventListener('change', applyFilters);
+            document.getElementById('gate-search').addEventListener('input', applyFilters);
+            document.getElementById('reset-filters').addEventListener('click', resetFilters);
+            
+            // Chart option buttons
+            const chartOptions = document.querySelectorAll('.chart-option');
+            chartOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    chartOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    updateCharts(gatesData);
+                });
+            });
+            
+            // Terminal selector buttons
+            const terminalButtons = document.querySelectorAll('.terminal-btn');
+            terminalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    terminalButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const terminal = button.getAttribute('data-terminal');
+                    drawTerminalMap(terminal);
+                });
+            });
+            
+            // Pagination
+            const pageButtons = document.querySelectorAll('.page-btn');
+            pageButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    alert(`Pagination functionality will be implemented in the next phase.`);
+                    // This would load the appropriate page of results
+                });
+            });
+            
+            // Mobile menu button
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navbar = document.querySelector('.navbar');
+            mobileMenuBtn.addEventListener('click', () => {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('terminal-filter').value = 'all';
+            document.getElementById('airline-filter').value = 'all';
+            document.getElementById('status-filter').value = 'all';
+            document.getElementById('walking-filter').value = 'all';
+            document.getElementById('gate-search').value = '';
+            applyFilters();
+        }
+
+        // Start the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

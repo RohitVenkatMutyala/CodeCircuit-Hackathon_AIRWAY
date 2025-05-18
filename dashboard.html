@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyWay - Airport Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0053b3;
+            --secondary-color: #53a0ff;
+            --accent-color: #ff9a3c;
+            --light-bg: #f5f9ff;
+            --dark-bg: #2c3e50;
+            --text-dark: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Styles */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .control-group select,
+        .control-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .update-btn {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1.5rem;
+            font-weight: 500;
+        }
+
+        .update-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dashboard-card h3 i {
+            color: var(--accent-color);
+        }
+
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        .wait-times {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .wait-time-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .wait-time-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .wait-time {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .wait-status {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-low {
+            background-color: #e6f7ed;
+            color: #2e7d32;
+        }
+
+        .status-medium {
+            background-color: #fff4e5;
+            color: #f57c00;
+        }
+
+        .status-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        .passenger-flow {
+            height: 300px;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .flow-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+
+        .flow-node span {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .flow-node.active {
+            border: 2px solid var(--accent-color);
+        }
+
+        .flow-arrow {
+            position: absolute;
+            background-color: #ddd;
+            height: 4px;
+            transform-origin: left center;
+        }
+
+        .flow-value {
+            position: absolute;
+            font-size: 0.8rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .amenity-popularity {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .amenity-card {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .amenity-card i {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .amenity-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .popularity-bar {
+            height: 8px;
+            background-color: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .popularity-level {
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        .forecast-day {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .forecast-day:last-child {
+            border-bottom: none;
+        }
+
+        .forecast-date {
+            font-weight: 500;
+        }
+
+        .forecast-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .forecast-temp {
+            font-weight: 700;
+        }
+
+        .congestion-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .metric-box {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .metric-box:last-child {
+            margin-right: 0;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style-type: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Legend styles */
+        .legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .navbar.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wait-times {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-plane"></i>
+                <h1>SkyWay</h1>
+            </a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="terminals.html" class="nav-link">Terminals</a>
+                <a href="gates.html" class="nav-link">Gates</a>
+                <a href="amenities.html" class="nav-link">Amenities</a>
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">Airport Dashboard</h1>
+        
+        <section class="dashboard-controls">
+            <div class="control-group">
+                <label for="terminal-select">Terminal</label>
+                <select id="terminal-select">
+                    <option value="all">All Terminals</option>
+                    <option value="T1">Terminal 1</option>
+                    <option value="T2">Terminal 2</option>
+                    <option value="T3">Terminal 3</option>
+                    <option value="T4">Terminal 4</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="date-input">Date</label>
+                <input type="date" id="date-input" value="2025-05-18">
+            </div>
+            <div class="control-group">
+                <label for="time-select">Time Period</label>
+                <select id="time-select">
+                    <option value="morning">Morning (6AM - 12PM)</option>
+                    <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                    <option value="evening">Evening (6PM - 12AM)</option>
+                    <option value="night">Night (12AM - 6AM)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button class="update-btn" id="update-dashboard">
+                    <i class="fas fa-sync-alt"></i> Update Dashboard
+                </button>
+            </div>
+        </section>
+
+        <section class="wait-times">
+            <div class="wait-time-card">
+                <h4>Security T1</h4>
+                <div class="wait-time">15 min</div>
+                <span class="wait-status status-medium">Moderate</span>
+            </div>
+            <div class="wait-time-card">
+                <h4>Security T2</h4>
+                <div class="wait-time">8 min</div>
+                <span class="wait-status status-low">Low</span>
+            </div>
+            <div class="wait-time-card">
+                <h4>Security T3</h4>
+                <div class="wait-time">25 min</div>
+                <span class="wait-status status-high">High</span>
+            </div>
+            <div class="wait-time-card">
+                <h4>Security T4</h4>
+                <div class="wait-time">12 min</div>
+                <span class="wait-status status-medium">Moderate</span>
+            </div>
+            <div class="wait-time-card">
+                <h4>Customs</h4>
+                <div class="wait-time">20 min</div>
+                <span class="wait-status status-high">High</span>
+            </div>
+            <div class="wait-time-card">
+                <h4>Check-in</h4>
+                <div class="wait-time">10 min</div>
+                <span class="wait-status status-medium">Moderate</span>
+            </div>
+        </section>
+ <br><br>
+        <section class="dashboard-grid">
+            <!-- Congestion Heatmap -->
+            <div class="dashboard-card full-width-card">
+    <h3><i class="fas fa-map-marked-alt"></i>  Congestion Data</h3>
+    <div class="congestion-metrics">
+        <div class="metric-box">
+            <div class="metric-value">72%</div>
+            <div class="metric-label">Overall Occupancy</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-value">T3</div>
+            <div class="metric-label">Busiest Terminal</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-value">10:30 AM</div>
+            <div class="metric-label">Peak Time</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-value">18 min</div>
+            <div class="metric-label">Avg. Security Wait</div>
+        </div>
+    </div>
+   
+   
+    
+</div>
+
+            
+            <!-- Flight Frequency by Terminal -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-plane-departure"></i> Flight Frequency</h3>
+                <div class="chart-container" id="flight-frequency-chart"></div>
+            </div>
+            
+            <!-- Gate Occupancy Status -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-door-open"></i> Gate Status</h3>
+                <div class="chart-container" id="gate-status-chart"></div>
+            </div>
+            
+            <!-- Peak Travel Times -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-chart-line"></i> Peak Travel Times</h3>
+                <div class="chart-container" id="peak-times-chart"></div>
+            </div>
+            
+            <!-- Delay Statistics -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-clock"></i> Flight Delay Statistics</h3>
+                <div class="chart-container" id="delay-stats-chart"></div>
+            </div>
+            
+            <!-- Weather Forecast -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-cloud-sun"></i> Weather Forecast</h3>
+                <div class="forecast-day">
+                    <span class="forecast-date">Today</span>
+                    <i class="fas fa-sun forecast-icon"></i>
+                    <span class="forecast-temp">75°F / 24°C</span>
+                </div>
+                <div class="forecast-day">
+                    <span class="forecast-date">Tomorrow</span>
+                    <i class="fas fa-cloud-sun forecast-icon"></i>
+                    <span class="forecast-temp">72°F / 22°C</span>
+                </div>
+                <div class="forecast-day">
+                    <span class="forecast-date">Tuesday</span>
+                    <i class="fas fa-cloud forecast-icon"></i>
+                    <span class="forecast-temp">68°F / 20°C</span>
+                </div>
+                <div class="forecast-day">
+                    <span class="forecast-date">Wednesday</span>
+                    <i class="fas fa-cloud-rain forecast-icon"></i>
+                    <span class="forecast-temp">65°F / 18°C</span>
+                </div>
+            </div>
+            
+            <!-- Amenity Popularity -->
+            <div class="dashboard-card">
+                <h3><i class="fas fa-store"></i> Amenity Popularity</h3>
+                <div class="amenity-popularity">
+                    <div class="amenity-card">
+                        <i class="fas fa-coffee"></i>
+                        <h4>Coffee Shop</h4>
+                        <div class="popularity-bar">
+                            <div class="popularity-level" style="width: 85%;"></div>
+                        </div>
+                        <span>85% Full</span>
+                    </div>
+                    <div class="amenity-card">
+                        <i class="fas fa-utensils"></i>
+                        <h4>Restaurant</h4>
+                        <div class="popularity-bar">
+                            <div class="popularity-level" style="width: 70%;"></div>
+                        </div>
+                        <span>70% Full</span>
+                    </div>
+                    <div class="amenity-card">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h4>Retail</h4>
+                        <div class="popularity-bar">
+                            <div class="popularity-level" style="width: 60%;"></div>
+                        </div>
+                        <span>60% Full</span>
+                    </div>
+                    <div class="amenity-card">
+                        <i class="fas fa-bed"></i>
+                        <h4>Lounge</h4>
+                        <div class="popularity-bar">
+                            <div class="popularity-level" style="width: 50%;"></div>
+                        </div>
+                        <span>50% Full</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Passenger Flow Visualization -->
+            <div class="dashboard-card full-width-card">
+                <h3><i class="fas fa-users"></i> Passenger Flow Visualization</h3>
+                <div class="passenger-flow" id="passenger-flow-visualization">
+                    <!-- Will be populated by D3.js -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>SkyWay Airport</h3>
+                <p>Making airport navigation intuitive and stress-free.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="terminals.html">Terminals</a></li>
+                    <li><a href="gates.html">Gates</a></li>
+                    <li><a href="amenities.html">Amenities</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Airport Map</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Travel Tips</a></li>
+                    <li><a href="#">Transportation</a></li>
+                    <li><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> info@skyway.com</li>
+                    <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Terminal 1, Gate Info Desk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 SkyWay Airport Navigation. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navbar = document.querySelector('.navbar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navbar.classList.toggle('active');
+        });
+
+        // Sample data for dashboard visualizations
+        const terminalData = {
+            T1: { flightCount: 125, gateCount: 20, peakTime: '10:30 AM', avgDelay: 15 },
+            T2: { flightCount: 98, gateCount: 18, peakTime: '1:15 PM', avgDelay: 12 },
+            T3: { flightCount: 157, gateCount: 25, peakTime: '11:45 AM', avgDelay: 22 },
+            T4: { flightCount: 85, gateCount: 15, peakTime: '9:30 AM', avgDelay: 8 }
+        };
+
+        const gateStatusData = {
+            T1: { occupied: 16, available: 4, boarding: 5, arrived: 7, departing: 4 },
+            T2: { occupied: 14, available: 4, boarding: 4, arrived: 6, departing: 4 },
+            T3: { occupied: 21, available: 4, boarding: 8, arrived: 10, departing: 3 },
+            T4: { occupied: 10, available: 5, boarding: 3, arrived: 4, departing: 3 }
+        };
+
+        const hourlyData = [
+            { hour: '6 AM', passengers: 850, delays: 5 },
+            { hour: '7 AM', passengers: 1200, delays: 8 },
+            { hour: '8 AM', passengers: 1800, delays: 12 },
+            { hour: '9 AM', passengers: 2100, delays: 15 },
+            { hour: '10 AM', passengers: 2500, delays: 20 },
+            { hour: '11 AM', passengers: 2300, delays: 18 },
+            { hour: '12 PM', passengers: 2000, delays: 15 },
+            { hour: '1 PM', passengers: 1800, delays: 12 },
+            { hour: '2 PM', passengers: 1600, delays: 10 },
+            { hour: '3 PM', passengers: 1900, delays: 14 },
+            { hour: '4 PM', passengers: 2100, delays: 16 },
+            { hour: '5 PM', passengers: 2300, delays: 19 },
+            { hour: '6 PM', passengers: 2000, delays: 15 },
+            { hour: '7 PM', passengers: 1700, delays: 12 },
+            { hour: '8 PM', passengers: 1500, delays: 10 },
+            { hour: '9 PM', passengers: 1200, delays: 8 },
+            { hour: '10 PM', passengers: 900, delays: 6 },
+            { hour: '11 PM', passengers: 600, delays: 4 }
+        ];
+
+        const delayReasons = {
+            weather: 35,
+            technical: 25,
+            operational: 20,
+            air_traffic: 15,
+            other: 5
+        };
+
+ const flowPoints = [
+    { id: 'entrance', label: 'Entrance', x: 100, y: 150 },
+    { id: 'check-in', label: 'Check-in', x: 220, y: 100 },
+    { id: 'security', label: 'Security', x: 350, y: 80 },
+    { id: 'gates', label: 'Gates', x: 480, y: 120 },
+    { id: 'boarding', label: 'Boarding', x: 600, y: 150 },
+    { id: 'baggage', label: 'Baggage', x: 220, y: 200 },
+    { id: 'customs', label: 'Customs', x: 350, y: 220 },
+    { id: 'exit', label: 'Exit', x: 480, y: 200 }
+];
+
+const flowConnections = [
+    { source: 'entrance', target: 'check-in', value: 85 },
+    { source: 'check-in', target: 'security', value: 80 },
+    { source: 'security', target: 'gates', value: 75 },
+    { source: 'gates', target: 'boarding', value: 60 },
+    { source: 'entrance', target: 'baggage', value: 40 },
+    { source: 'baggage', target: 'customs', value: 35 },
+    { source: 'customs', target: 'exit', value: 30 },
+    { source: 'gates', target: 'exit', value: 15 }
+];
+
+// Initialize charts when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all charts
+    initFlightFrequencyChart();
+    initGateStatusChart();
+    initPeakTimesChart();
+    initDelayStatsChart();
+    initPassengerFlowVisualization();
+    
+    // Add event listener for dashboard updates
+    document.getElementById('update-dashboard').addEventListener('click', updateDashboard);
+});
+
+// Flight Frequency Chart
+function initFlightFrequencyChart() {
+    const ctx = document.createElement('canvas');
+    document.getElementById('flight-frequency-chart').appendChild(ctx);
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Terminal 1', 'Terminal 2', 'Terminal 3', 'Terminal 4'],
+            datasets: [{
+                label: 'Number of Flights',
+                data: [terminalData.T1.flightCount, terminalData.T2.flightCount, 
+                       terminalData.T3.flightCount, terminalData.T4.flightCount],
+                backgroundColor: [
+                    'rgba(83, 160, 255, 0.7)',
+                    'rgba(83, 160, 255, 0.7)',
+                    'rgba(83, 160, 255, 0.7)',
+                    'rgba(83, 160, 255, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(0, 83, 179, 1)',
+                    'rgba(0, 83, 179, 1)',
+                    'rgba(0, 83, 179, 1)',
+                    'rgba(0, 83, 179, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Gate Status Chart
+function initGateStatusChart() {
+    const ctx = document.createElement('canvas');
+    document.getElementById('gate-status-chart').appendChild(ctx);
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Occupied', 'Available', 'Boarding', 'Arrived', 'Departing'],
+            datasets: [{
+                data: [
+                    gateStatusData.T1.occupied + gateStatusData.T2.occupied + 
+                    gateStatusData.T3.occupied + gateStatusData.T4.occupied,
+                    gateStatusData.T1.available + gateStatusData.T2.available + 
+                    gateStatusData.T3.available + gateStatusData.T4.available,
+                    gateStatusData.T1.boarding + gateStatusData.T2.boarding + 
+                    gateStatusData.T3.boarding + gateStatusData.T4.boarding,
+                    gateStatusData.T1.arrived + gateStatusData.T2.arrived + 
+                    gateStatusData.T3.arrived + gateStatusData.T4.arrived,
+                    gateStatusData.T1.departing + gateStatusData.T2.departing + 
+                    gateStatusData.T3.departing + gateStatusData.T4.departing
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Peak Times Chart
+function initPeakTimesChart() {
+    const ctx = document.createElement('canvas');
+    document.getElementById('peak-times-chart').appendChild(ctx);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: hourlyData.map(data => data.hour),
+            datasets: [{
+                label: 'Passenger Count',
+                data: hourlyData.map(data => data.passengers),
+                borderColor: 'rgba(0, 83, 179, 1)',
+                backgroundColor: 'rgba(83, 160, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Delay Statistics Chart
+function initDelayStatsChart() {
+    const ctx = document.createElement('canvas');
+    document.getElementById('delay-stats-chart').appendChild(ctx);
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Weather', 'Technical', 'Operational', 'Air Traffic', 'Other'],
+            datasets: [{
+                data: [
+                    delayReasons.weather,
+                    delayReasons.technical,
+                    delayReasons.operational,
+                    delayReasons.air_traffic,
+                    delayReasons.other
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Passenger Flow Visualization
+function initPassengerFlowVisualization() {
+    const container = d3.select('#passenger-flow-visualization');
+    const width = container.node().getBoundingClientRect().width;
+    const height = container.node().getBoundingClientRect().height;
+    
+    // Scale the coordinates to fit the container
+    const xScale = d3.scaleLinear()
+        .domain([0, 700])
+        .range([50, width - 50]);
+    
+    const yScale = d3.scaleLinear()
+        .domain([0, 300])
+        .range([50, height - 50]);
+    
+    // Draw flow arrows
+    flowConnections.forEach(connection => {
+        const source = flowPoints.find(p => p.id === connection.source);
+        const target = flowPoints.find(p => p.id === connection.target);
+        
+        if (source && target) {
+            const sourceX = xScale(source.x);
+            const sourceY = yScale(source.y);
+            const targetX = xScale(target.x);
+            const targetY = yScale(target.y);
+            
+            // Calculate angle for arrow
+            const angle = Math.atan2(targetY - sourceY, targetX - sourceX) * 180 / Math.PI;
+            
+            // Calculate length
+            const length = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
+            
+            // Create arrow
+            container.append('div')
+                .attr('class', 'flow-arrow')
+                .style('left', `${sourceX}px`)
+                .style('top', `${sourceY}px`)
+                .style('width', `${length}px`)
+                .style('transform', `rotate(${angle}deg)`)
+                .style('opacity', connection.value / 100);
+            
+            // Create flow value label
+            container.append('div')
+                .attr('class', 'flow-value')
+                .style('left', `${sourceX + (targetX - sourceX) / 2 - 20}px`)
+                .style('top', `${sourceY + (targetY - sourceY) / 2 - 15}px`)
+                .text(`${connection.value}%`);
+        }
+    });
+    
+    // Create flow nodes
+    flowPoints.forEach(point => {
+        container.append('div')
+            .attr('class', 'flow-node')
+            .style('left', `${xScale(point.x) - 30}px`)
+            .style('top', `${yScale(point.y) - 30}px`)
+            .html(`<span>${point.label}</span>`);
+    });
+}
+
+// Update dashboard based on selected filters
+function updateDashboard() {
+    const terminal = document.getElementById('terminal-select').value;
+    const date = document.getElementById('date-input').value;
+    const timePeriod = document.getElementById('time-select').value;
+    
+    // Show loading state
+    const updateBtn = document.getElementById('update-dashboard');
+    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+        // Update wait times based on selection
+        updateWaitTimes(terminal, timePeriod);
+        
+        // Update charts with new data
+        updateCharts(terminal, timePeriod);
+        
+        // Reset button
+        updateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Dashboard';
+        
+        // Show success message
+        alert(`Dashboard updated for ${terminal === 'all' ? 'All Terminals' : terminal} - ${date} (${timePeriod})`);
+    }, 1000);
+}
+
+// Update wait times based on selection
+function updateWaitTimes(terminal, timePeriod) {
+    // Sample wait time data for different scenarios
+    const waitTimeData = {
+        'all': {
+            'morning': { T1: 20, T2: 15, T3: 30, T4: 25, customs: 35, checkin: 15 },
+            'afternoon': { T1: 15, T2: 8, T3: 25, T4: 12, customs: 20, checkin: 10 },
+            'evening': { T1: 10, T2: 5, T3: 15, T4: 8, customs: 15, checkin: 5 },
+            'night': { T1: 5, T2: 3, T3: 7, T4: 4, customs: 10, checkin: 3 }
+        },
+        'T1': {
+            'morning': { T1: 25, T2: 15, T3: 30, T4: 25, customs: 35, checkin: 20 },
+            'afternoon': { T1: 20, T2: 8, T3: 25, T4: 12, customs: 20, checkin: 15 },
+            'evening': { T1: 15, T2: 5, T3: 15, T4: 8, customs: 15, checkin: 10 },
+            'night': { T1: 8, T2: 3, T3: 7, T4: 4, customs: 10, checkin: 5 }
+        },
+        // Additional terminal data would go here
+    };
+    
+    // Use 'all' data as fallback for other terminals
+    const data = waitTimeData[terminal] || waitTimeData['all'];
+    const times = data[timePeriod];
+    
+    // Update the wait time cards
+    document.querySelector('.wait-time-card:nth-child(1) .wait-time').textContent = `${times.T1} min`;
+    document.querySelector('.wait-time-card:nth-child(2) .wait-time').textContent = `${times.T2} min`;
+    document.querySelector('.wait-time-card:nth-child(3) .wait-time').textContent = `${times.T3} min`;
+    document.querySelector('.wait-time-card:nth-child(4) .wait-time').textContent = `${times.T4} min`;
+    document.querySelector('.wait-time-card:nth-child(5) .wait-time').textContent = `${times.customs} min`;
+    document.querySelector('.wait-time-card:nth-child(6) .wait-time').textContent = `${times.checkin} min`;
+    
+    // Update status classes
+    updateWaitTimeStatus();
+}
+
+// Update wait time status indicators
+function updateWaitTimeStatus() {
+    const waitTimeElements = document.querySelectorAll('.wait-time');
+    
+    waitTimeElements.forEach(element => {
+        const minutes = parseInt(element.textContent);
+        const statusElement = element.nextElementSibling;
+        
+        statusElement.className = 'wait-status';
+        
+        if (minutes < 10) {
+            statusElement.classList.add('status-low');
+            statusElement.textContent = 'Low';
+        } else if (minutes < 20) {
+            statusElement.classList.add('status-medium');
+            statusElement.textContent = 'Moderate';
+        } else {
+            statusElement.classList.add('status-high');
+            statusElement.textContent = 'High';
+        }
+    });
+}
+
+// Update all charts
+function updateCharts(terminal, timePeriod) {
+    // Remove all existing charts
+    document.querySelectorAll('.chart-container canvas').forEach(canvas => {
+        canvas.remove();
+    });
+    
+    // Reinitialize charts with new data
+    initFlightFrequencyChart();
+    initGateStatusChart();
+    initPeakTimesChart();
+    initDelayStatsChart();
+    
+    // Clear and redraw passenger flow
+    document.getElementById('passenger-flow-visualization').innerHTML = '';
+    initPassengerFlowVisualization();
+    
+    // Update congestion metrics
+    updateCongestionMetrics(terminal, timePeriod);
+}
+
+// Update congestion metrics
+function updateCongestionMetrics(terminal, timePeriod) {
+    const metricsData = {
+        'all': {
+            'morning': { occupancy: '85%', busiest: 'T3', peak: '9:30 AM', avgWait: '25 min' },
+            'afternoon': { occupancy: '72%', busiest: 'T3', peak: '1:30 PM', avgWait: '18 min' },
+            'evening': { occupancy: '65%', busiest: 'T1', peak: '7:15 PM', avgWait: '12 min' },
+            'night': { occupancy: '35%', busiest: 'T2', peak: '12:30 AM', avgWait: '5 min' }
+        },
+        'T1': {
+            'morning': { occupancy: '80%', busiest: 'T1', peak: '9:15 AM', avgWait: '20 min' },
+            'afternoon': { occupancy: '70%', busiest: 'T1', peak: '1:45 PM', avgWait: '15 min' },
+            'evening': { occupancy: '75%', busiest: 'T1', peak: '7:30 PM', avgWait: '10 min' },
+            'night': { occupancy: '30%', busiest: 'T1', peak: '12:15 AM', avgWait: '3 min' }
+        }
+        // Additional terminal data would go here
+    };
+    
+    // Use 'all' data as fallback for other terminals
+    const data = metricsData[terminal] || metricsData['all'];
+    const metrics = data[timePeriod];
+    
+    // Update the metric values
+    document.querySelector('.metric-box:nth-child(1) .metric-value').textContent = metrics.occupancy;
+    document.querySelector('.metric-box:nth-child(2) .metric-value').textContent = metrics.busiest;
+    document.querySelector('.metric-box:nth-child(3) .metric-value').textContent = metrics.peak;
+    document.querySelector('.metric-box:nth-child(4) .metric-value').textContent = metrics.avgWait;
+    // Terminal Congestion Heatmap
+function initCongestionHeatmap() {
+    const container = d3.select('#congestion-heatmap');
+    const terminals = ['T1', 'T2', 'T3', 'T4'];
+    const timePeriods = ['morning', 'afternoon', 'evening', 'night'];
+    
+    // Sample congestion data
+    const congestionData = {
+        'T1': { morning: 80, afternoon: 70, evening: 75, night: 30 },
+        'T2': { morning: 65, afternoon: 55, evening: 60, night: 35 },
+        'T3': { morning: 85, afternoon: 72, evening: 65, night: 40 },
+        'T4': { morning: 60, afternoon: 50, evening: 55, night: 25 }
+    };
+    
+    // Clear any existing heatmap
+    container.selectAll('*').remove();
+    
+    // Create heatmap
+    terminals.forEach((terminal, rowIndex) => {
+        timePeriods.forEach((timePeriod, colIndex) => {
+            const occupancy = congestionData[terminal][timePeriod];
+            const color = d3.interpolateReds(occupancy / 100);
+            
+            container.append('div')
+                .attr('class', 'heatmap-cell')
+                .style('grid-row', rowIndex + 1)
+                .style('grid-column', colIndex + 1)
+                .style('background-color', color)
+                .text(`${occupancy}%`);
+        });
+    });
+}
+
+// Call the function to initialize the heatmap on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    initCongestionHeatmap();
+});
+
+}
+</script>
+</body>
+</html>

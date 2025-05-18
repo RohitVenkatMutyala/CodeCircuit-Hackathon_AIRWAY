@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyWay - Airport Amenities</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0053b3;
+            --secondary-color: #53a0ff;
+            --accent-color: #ff9a3c;
+            --light-bg: #f5f9ff;
+            --dark-bg: #2c3e50;
+            --text-dark: #333;
+            --text-light: #fff;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Styles */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .amenities-hero {
+            background-image: linear-gradient(rgba(0, 83, 179, 0.7), rgba(0, 83, 179, 0.7)), url('/api/placeholder/1200/300');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .amenities-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .amenities-hero p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--light-bg);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border-color: var(--primary-color);
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .amenity-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .amenity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .amenity-img {
+            height: 160px;
+            background-color: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .amenity-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .amenity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .amenity-details {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .amenity-name {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .amenity-location {
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .amenity-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .amenity-hours, .amenity-distance {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .amenity-description {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .amenity-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .occupancy-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .occupancy-bar {
+            width: 80px;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .occupancy-level {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .occupancy-low {
+            background-color: #4caf50;
+            width: 30%;
+        }
+
+        .occupancy-medium {
+            background-color: #ff9800;
+            width: 60%;
+        }
+
+        .occupancy-high {
+            background-color: #f44336;
+            width: 90%;
+        }
+
+        .amenity-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .amenity-btn:hover {
+            color: var(--secondary-color);
+        }
+
+        .popularity-chart {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-header h2 {
+            color: var(--primary-color);
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        /* Terminal Map Styles */
+        .terminal-map-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .terminal-header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-selector {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .terminal-tab {
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .terminal-tab:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .terminal-tab.active {
+            background-color: var(--accent-color);
+        }
+
+        .terminal-map-container {
+            padding: 1.5rem;
+        }
+
+        .map-with-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .map-container {
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-legend {
+            width: 200px;
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style-type: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .navbar.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .amenities-hero {
+                padding: 2rem 1rem;
+            }
+
+            .amenities-hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .amenities-hero p {
+                font-size: 1rem;
+            }
+
+            .filter-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 0.5rem;
+            }
+
+            .terminal-selector {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-plane"></i>
+                <h1>SkyWay</h1>
+            </a>
+            <nav class="navbar">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="terminals.html" class="nav-link">Terminals</a>
+                <a href="gates.html" class="nav-link">Gates</a>
+                <a href="amenities.html" class="nav-link active">Amenities</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="amenities-hero">
+            <h2>Airport Amenities</h2>
+            <p>Find restaurants, shops, lounges, and services across all terminals. Real-time occupancy data helps you discover less crowded options.</p>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search for amenities...">
+                <button class="search-button">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </section>
+
+        <section class="filter-container">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="food">Restaurants</button>
+            <button class="filter-btn" data-filter="shops">Shops</button>
+            <button class="filter-btn" data-filter="lounges">Lounges</button>
+            <button class="filter-btn" data-filter="services">Services</button>
+            <select id="terminal-filter" class="filter-btn">
+                <option value="all">All Terminals</option>
+                <option value="t1">Terminal 1</option>
+                <option value="t2">Terminal 2</option>
+                <option value="t3">Terminal 3</option>
+                <option value="t4">Terminal 4</option>
+            </select>
+        </section>
+
+        <section class="amenities-grid" id="amenities-container">
+            <!-- Amenities will be loaded dynamically -->
+        </section>
+
+        <section class="terminal-map-section">
+            <div class="terminal-header">
+                <h2>Find Amenities</h2>
+                <div class="terminal-selector">
+                    <div class="terminal-tab active" data-terminal="t1">T1</div>
+                    <div class="terminal-tab" data-terminal="t2">T2</div>
+                    <div class="terminal-tab" data-terminal="t3">T3</div>
+                    <div class="terminal-tab" data-terminal="t4">T4</div>
+                </div>
+            </div>
+            <div class="terminal-map-container">
+                <div class="map-with-legend">
+                    <div class="map-container" id="amenities-map"></div>
+                    <div class="map-legend">
+                        <div class="legend-title">Map Legend</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #4caf50;"></div>
+                            <span>Restaurants</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #2196f3;"></div>
+                            <span>Shops</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #9c27b0;"></div>
+                            <span>Lounges</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff9800;"></div>
+                            <span>Services</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f44336;"></div>
+                            <span>You Are Here</span>
+                        </div>
+                        <div class="legend-title" style="margin-top: 1rem;">Occupancy</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #4caf50;"></div>
+                            <span>Low (< 40%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff9800;"></div>
+                            <span>Medium (40-70%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f44336;"></div>
+                            <span>High (> 70%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="popularity-chart">
+            <div class="chart-header">
+                <h2>Amenity Popularity by Time</h2>
+                <select id="chart-type-selector" class="filter-btn">
+                    <option value="restaurants">Restaurants</option>
+                    <option value="shops">Shops</option>
+                    <option value="lounges">Lounges</option>
+                    <option value="services">Services</option>
+                </select>
+            </div>
+            <div class="chart-container" id="popularity-chart"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>SkyWay Airport</h3>
+                <p>Making airport navigation intuitive and stress-free.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="terminals.html">Terminals</a></li>
+                    <li><a href="gates.html">Gates</a></li>
+                    <li><a href="amenities.html">Amenities</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Airport Map</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Travel Tips</a></li>
+                    <li><a href="#">Transportation</a></li>
+                    <li><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> info@skyway.com</li>
+                    <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Terminal 1, Gate Info Desk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 SkyWay Airport Navigation. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navbar = document.querySelector('.navbar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navbar.classList.toggle('active');
+        });
+
+        // Sample amenities data
+        const amenitiesData = [
+            {
+                id: 1,
+                name: "Sky Café",
+                type: "food",
+                terminal: "t1",
+                location: "Terminal 1, Near Gate A5",
+                hours: "5:00 AM - 10:00 PM",
+                distance: "2 min walk",
+                description: "Coffee, pastries, and light meals with a view of the runway.",
+                occupancy: "low",
+                image: "https://th.bing.com/th/id/OIP.X8AVCRMEeELdNt2Yf7gSvAHaEc?rs=1&pid=ImgDetMain/300/160"
+                
+            },
+            {
+                id: 2,
+                name: "Global Reads",
+                type: "shops",
+                terminal: "t1",
+                location: "Terminal 1, Main Concourse",
+                hours: "6:00 AM - 9:00 PM",
+                distance: "5 min walk",
+                description: "Bookstore offering bestsellers, magazines, and travel essentials.",
+                occupancy: "medium",
+                image: "https://th.bing.com/th/id/OIP.OLUMKB27ir9Gx_D524nrNQHaE8?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 3,
+                name: "Executive Lounge",
+                type: "lounges",
+                terminal: "t1",
+                location: "Terminal 1, Upper Level",
+                hours: "24 hours",
+                distance: "8 min walk",
+                description: "Premium lounge with comfortable seating, complimentary food, and business center.",
+                occupancy: "low",
+                image: "https://th.bing.com/th/id/OIP.HIJ_I9ZSV5qcUxoJ_jaDaQHaE8?rs=1&pid=ImgDetMainr/300/160"
+            },
+            {
+                id: 4,
+                name: "Quick Spa",
+                type: "services",
+                terminal: "t1",
+                location: "Terminal 1, Near Gate A12",
+                hours: "7:00 AM - 8:00 PM",
+                distance: "4 min walk",
+                description: "Express massages and beauty treatments for travelers on the go.",
+                occupancy: "high",
+                image: "https://th.bing.com/th/id/OIP.RNTYUJJf6WXWVgwC2mPZPwHaEo?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 5,
+                name: "Burger Junction",
+                type: "food",
+                terminal: "t2",
+                location: "Terminal 2, Food Court",
+                hours: "6:00 AM - 10:00 PM",
+                distance: "3 min walk",
+                description: "Gourmet burgers, fries, and shakes with vegetarian options available.",
+                occupancy: "high",
+                image: "https://th.bing.com/th/id/OIP.a20d8SNFRV8qOVP_7rgmEgHaER?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 6,
+                name: "Duty Free Zone",
+                type: "shops",
+                terminal: "t2",
+                location: "Terminal 2, International Departures",
+                hours: "24 hours",
+                distance: "6 min walk",
+                description: "Tax-free shopping for perfumes, liquor, electronics, and luxury goods.",
+                occupancy: "medium",
+                image: "https://th.bing.com/th/id/OIP.VXYmawdDijC-rnni7GR2SgHaFj?w=1900&h=1425&rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 7,
+                name: "SkyClub Lounge",
+                type: "lounges",
+                terminal: "t2",
+                location: "Terminal 2, Gate B10",
+                hours: "5:00 AM - 11:00 PM",
+                distance: "7 min walk",
+                description: "Exclusive lounge with premium amenities, showers, and quiet zones.",
+                occupancy: "medium",
+                image: "https://th.bing.com/th/id/OIP.2jKsXez0rj8JSklY70OYeQHaEK?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 8,
+                name: "Currency Exchange",
+                type: "services",
+                terminal: "t2",
+                location: "Terminal 2, Arrivals Hall",
+                hours: "6:00 AM - 10:00 PM",
+                distance: "2 min walk",
+                description: "Foreign currency exchange with competitive rates and multiple currencies.",
+                occupancy: "low",
+                image: "https://th.bing.com/th/id/OIP.zGw85-jl19w3B_MDSP_M_AHaEo?w=1080&h=675&rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 9,
+                name: "Asian Fusion",
+                type: "food",
+                terminal: "t3",
+                location: "Terminal 3, Gate C8",
+                hours: "10:00 AM - 9:00 PM",
+                distance: "5 min walk",
+                description: "Pan-Asian cuisine featuring sushi, noodles, and rice bowls.",
+                occupancy: "medium",
+                image: "https://th.bing.com/th/id/R.014c29653b92de39543bd08dd2d6df52?rik=ZkpTVcs71u1IVw&riu=http%3a%2f%2feastgatesushi.com%2fwp-content%2fuploads%2f2012%2f01%2fEastGateSushi-062.jpg&ehk=j0q4h0d7hMWiomav6Ddkg73CVEZ02dSDcP%2bUXWs%2bT1U%3d&risl=&pid=ImgRaw&r=0/300/160"
+            },
+            {
+                id: 10,
+                name: "Travel Essentials",
+                type: "shops",
+                terminal: "t3",
+                location: "Terminal 3, Main Hall",
+                hours: "24 hours",
+                distance: "1 min walk",
+                description: "Convenience store offering travel necessities, snacks, and electronics.",
+                occupancy: "low",
+                image: "https://th.bing.com/th/id/OIP.LOTYNBcoyCd43ymsj8BH4AHaE8?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 11,
+                name: "Quiet Zone",
+                type: "lounges",
+                terminal: "t3",
+                location: "Terminal 3, Upper Level",
+                hours: "24 hours",
+                distance: "10 min walk",
+                description: "Free relaxation area with recliners and charging stations.",
+                occupancy: "high",
+                image: "https://th.bing.com/th/id/OIP.6KbQIvzNEpjcGYxgNfTFJgHaE8?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 12,
+                name: "Baggage Storage",
+                type: "services",
+                terminal: "t3",
+                location: "Terminal 3, Lower Level",
+                hours: "5:00 AM - 11:00 PM",
+                distance: "8 min walk",
+                description: "Secure short-term and long-term luggage storage solutions.",
+                occupancy: "medium",
+                image: "https://www.berlin.de/binaries/asset/image_assets/7242862/ratio_2_1/1651648961/1000x500/300/160"
+            },
+            {
+                id: 13,
+                name: "Pizza Express",
+                type: "food",
+                terminal: "t4",
+                location: "Terminal 4, Gate D3",
+                hours: "11:00 AM - 10:00 PM",
+                distance: "4 min walk",
+                description: "Fresh pizzas, salads, and Italian favorites made to order.",
+                occupancy: "low",
+                image: "https://th.bing.com/th/id/OIP.TJQwywhRldJa5H2F8SmI6QHaEK?rs=1&pid=ImgDetMain/300/160"
+            },
+            {
+                id: 14,
+                name: "Fashion District",
+                type: "shops",
+                terminal: "t4",
+                location: "Terminal 4, Shopping Plaza",
+                hours: "8:00 AM - 9:00 PM",
+                distance: "6 min walk",
+                description: "Designer clothing, accessories, and travel apparel from top brands.",
+                occupancy: "medium",
+                image: "https://th.bing.com/th/id/OIP.__Gkv3VJxT13uTgqLsIstQHaEo?rs=1&pid=ImgDetMain/300/160"
+            },
+           // Complete the amenity that was cut off
+{
+    id: 15,
+    name: "First Class Lounge",
+    type: "lounges",
+    terminal: "t4",
+    location: "Terminal 4, Upper Level",
+    hours: "24 hours",
+    distance: "9 min walk",
+    description: "Premium lounge with complimentary dining, private work areas, and shower facilities.",
+    occupancy: "high",
+    image: "https://th.bing.com/th/id/OIP.RqRUrBnD3i_WAh26Sr8tFwHaEn?rs=1&pid=ImgDetMain/300/160"
+},
+{
+    id: 16,
+    name: "Tech Support Center",
+    type: "services",
+    terminal: "t4",
+    location: "Terminal 4, Central Concourse",
+    hours: "7:00 AM - 9:00 PM",
+    distance: "3 min walk",
+    description: "Technical assistance, device charging, and electronics rental services.",
+    occupancy: "low",
+    image: "https://th.bing.com/th/id/OIP.FLh7q_lRy_WsYu-nrtbkSwHaET?rs=1&pid=ImgDetMain/300/160"
+}
+];
+
+// Function to display amenities
+function displayAmenities(amenities) {
+    const container = document.getElementById('amenities-container');
+    container.innerHTML = '';
+
+    if (amenities.length === 0) {
+        container.innerHTML = '<p class="no-results">No amenities found matching your criteria.</p>';
+        return;
+    }
+
+    amenities.forEach(amenity => {
+        const card = document.createElement('div');
+        card.className = 'amenity-card';
+        card.dataset.type = amenity.type;
+        card.dataset.terminal = amenity.terminal;
+
+        // Determine occupancy class
+        let occupancyClass = '';
+        let occupancyWidth = '';
+        let occupancyText = '';
+        
+        switch(amenity.occupancy) {
+            case 'low':
+                occupancyClass = 'occupancy-low';
+                occupancyText = 'Low Occupancy';
+                break;
+            case 'medium':
+                occupancyClass = 'occupancy-medium';
+                occupancyText = 'Medium Occupancy';
+                break;
+            case 'high':
+                occupancyClass = 'occupancy-high';
+                occupancyText = 'High Occupancy';
+                break;
+        }
+
+        // Format amenity type for display
+        let amenityType = amenity.type.charAt(0).toUpperCase() + amenity.type.slice(1);
+
+        card.innerHTML = `
+            <div class="amenity-img">
+                <img src="${amenity.image}" alt="${amenity.name}">
+                <div class="amenity-badge">${amenityType}</div>
+            </div>
+            <div class="amenity-details">
+                <h3 class="amenity-name">${amenity.name}</h3>
+                <div class="amenity-location">
+                    <i class="fas fa-map-marker-alt"></i> ${amenity.location}
+                </div>
+                <div class="amenity-info">
+                    <div class="amenity-hours">
+                        <i class="far fa-clock"></i> ${amenity.hours}
+                    </div>
+                    <div class="amenity-distance">
+                        <i class="fas fa-walking"></i> ${amenity.distance}
+                    </div>
+                </div>
+                <p class="amenity-description">${amenity.description}</p>
+                <div class="amenity-status">
+                    <div class="occupancy-indicator">
+                        <span>${occupancyText}</span>
+                        <div class="occupancy-bar">
+                            <div class="occupancy-level ${occupancyClass}"></div>
+                        </div>
+                    </div>
+                    <a href="#" class="amenity-btn" data-id="${amenity.id}">More Info</a>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// Filter functions
+function filterAmenities() {
+    const typeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    const terminalFilter = document.getElementById('terminal-filter').value;
+    const searchText = document.querySelector('.search-input').value.toLowerCase();
+    
+    let filteredAmenities = amenitiesData;
+    
+    // Filter by type
+    if (typeFilter !== 'all') {
+        filteredAmenities = filteredAmenities.filter(amenity => amenity.type === typeFilter);
+    }
+    
+    // Filter by terminal
+    if (terminalFilter !== 'all') {
+        filteredAmenities = filteredAmenities.filter(amenity => amenity.terminal === terminalFilter);
+    }
+    
+    // Filter by search text
+    if (searchText) {
+        filteredAmenities = filteredAmenities.filter(amenity => 
+            amenity.name.toLowerCase().includes(searchText) || 
+            amenity.description.toLowerCase().includes(searchText) ||
+            amenity.location.toLowerCase().includes(searchText)
+        );
+    }
+    
+    displayAmenities(filteredAmenities);
+}
+
+// Terminal map functionality
+function initializeTerminalMap() {
+    // This would typically use a mapping library like Leaflet or MapBox
+    // Here we're simulating a map with just a placeholder
+    const map = document.getElementById('amenities-map');
+    const activeTerminal = document.querySelector('.terminal-tab.active').dataset.terminal;
+    
+    // In a real implementation, you would load the appropriate map for the terminal
+    map.style.backgroundImage = `url('/api/placeholder/800/400')`;
+    map.innerHTML = `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+        <h3>Terminal ${activeTerminal.substring(1)} Map</h3>
+        <p>Interactive map would display here with amenity locations.</p>
+    </div>`;
+}
+
+// Popularity chart functionality
+function createPopularityChart() {
+    const chartType = document.getElementById('chart-type-selector').value;
+    const chartContainer = document.getElementById('popularity-chart');
+    
+    // Sample data for popularity chart
+    const timeSlots = ['6 AM', '8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'];
+    let data;
+    
+    switch(chartType) {
+        case 'restaurants':
+            data = [20, 45, 60, 85, 70, 50, 75, 65, 30];
+            break;
+        case 'shops':
+            data = [15, 30, 40, 45, 60, 70, 75, 60, 25];
+            break;
+        case 'lounges':
+            data = [40, 35, 30, 45, 55, 50, 60, 65, 45];
+            break;
+        case 'services':
+            data = [25, 55, 45, 30, 25, 35, 30, 25, 15];
+            break;
+    }
+    
+    // Clear previous chart
+    chartContainer.innerHTML = '';
+    
+    // Set up dimensions
+    const margin = {top: 20, right: 30, bottom: 50, left: 50};
+    const width = chartContainer.clientWidth - margin.left - margin.right;
+    const height = chartContainer.clientHeight - margin.top - margin.bottom;
+    
+    // Create SVG
+    const svg = d3.select(chartContainer)
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // X scale
+    const x = d3.scaleBand()
+        .domain(timeSlots)
+        .range([0, width])
+        .padding(0.2);
+    
+    // Y scale
+    const y = d3.scaleLinear()
+        .domain([0, 100])
+        .range([height, 0]);
+    
+    // Add X axis
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+    
+    // Add Y axis
+    svg.append("g")
+        .call(d3.axisLeft(y));
+    
+    // Add X axis label
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 5)
+        .text("Time of Day");
+    
+    // Add Y axis label
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left + 15)
+        .attr("x", -height / 2)
+        .text("Occupancy (%)");
+    
+    // Add bars
+    svg.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d, i) => x(timeSlots[i]))
+        .attr("y", d => y(d))
+        .attr("width", x.bandwidth())
+        .attr("height", d => height - y(d))
+        .attr("fill", d => {
+            if (d < 40) return "#4caf50";
+            else if (d < 70) return "#ff9800";
+            else return "#f44336";
+        });
+    
+    // Add chart title
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .style("font-size", "1.2em")
+        .text(`${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Occupancy by Time`);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize amenities
+    displayAmenities(amenitiesData);
+    
+    // Initialize terminal map
+    initializeTerminalMap();
+    
+    // Initialize popularity chart
+    createPopularityChart();
+    
+    // Filter button click event
+    const filterButtons = document.querySelectorAll('.filter-btn[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all filter buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            // Apply filters
+            filterAmenities();
+        });
+    });
+    
+    // Terminal filter change event
+    document.getElementById('terminal-filter').addEventListener('change', filterAmenities);
+    
+    // Search input event
+    document.querySelector('.search-input').addEventListener('input', filterAmenities);
+    
+    // Terminal map tab click event
+    const terminalTabs = document.querySelectorAll('.terminal-tab');
+    terminalTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all terminal tabs
+            terminalTabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            // Update terminal map
+            initializeTerminalMap();
+        });
+    });
+    
+    // Chart type change event
+    document.getElementById('chart-type-selector').addEventListener('change', createPopularityChart);
+    
+    // Amenity more info button click event
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('amenity-btn')) {
+            e.preventDefault();
+            const amenityId = parseInt(e.target.dataset.id);
+            const amenity = amenitiesData.find(item => item.id === amenityId);
+            if (amenity) {
+                alert(`More information about ${amenity.name} will be displayed in a modal in the full implementation.`);
+            }
+        }
+    });
+    
+    // Window resize event for responsive chart
+    window.addEventListener('resize', function() {
+        createPopularityChart();
+    });
+});
+</script>
+</body>
+</html>
